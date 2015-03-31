@@ -75,7 +75,7 @@ def lower_index_term(term):
     In case of problems with UTF-8 compliance, this function raises
     UnicodeDecodeError, so the client code may want to catch it.
     """
-    return unicode(term, 'utf-8').lower().encode('utf-8')
+    return term.decode('utf-8').lower().encode('utf-8')
 
 latex_markup_re = re.compile(r"\\begin(\[.+?\])?\{.+?\}|\\end\{.+?}|\\\w+(\[.+?\])?\{(?P<inside1>.*?)\}|\{\\\w+ (?P<inside2>.*?)\}")
 def remove_latex_markup(phrase):
