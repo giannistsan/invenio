@@ -17,16 +17,15 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% macro render_record_footer(number_of_displayed_authors) %}
-    <p>
+{% macro render_record_authors(number_of_displayed_authors) %}
+
       {% if record.get('number_of_authors', 0) > 0 %}
-      <i class="glyphicon glyphicon-user"></i> by
         {% set authors = record.get('authors[:].full_name', []) %}
         {% set sep = joiner("; ") %}
-        {% for full_name in authors[0:number_of_displayed_authors] %} {{ sep() }}
-          <a href="{{ url_for('search.search', p='author:"' + full_name + '"') }}">
+        {% for full_name in authors[0:number_of_displayed_authors] %}<small>{{ sep() }}</small> 
+          <small class="text-left" ><a href="{{ url_for('search.search', p='author:"' + full_name + '"') }}">
             {{ full_name }}
-          </a>
+          </a></small>
         {% endfor %}
         {% if record.get('number_of_authors', 0) > number_of_displayed_authors %}
         {{ sep() }}
@@ -37,14 +36,20 @@
         </a>
         {% endif %}
 
-      |
       {% endif %}
+{% endmacro %}
+
+
+{% macro render_creation_date() %}
       <i class="glyphicon glyphicon-calendar"></i> {{ record['creation_date']|invenio_format_date() }}
+{% endmacro %}
+
+{% macro render_record_footer(number_of_displayed_authors) %}
       {# Citations link #}
       {%- if config.CFG_BIBRANK_SHOW_CITATION_LINKS -%}
         {%- set num_citations = record['cited_by_count'] -%}
         {%- if num_citations -%}
-         |
+         |l
         <a href="{{ url_for('.search', p="refersto:recid:%d" % recid) }}">
            <i class="glyphicon glyphicon-share"></i>
           {{ "%i" % num_citations + _(" citations") if num_citations > 1 else _("1 citation") }}
@@ -76,7 +81,7 @@
         {%- endif -%}
       {%- endif -%}
 
-      | <a href="{{ url_for('search.search', p='recid:%s' % recid, rm='wrd') }}">{{ _("Similar records") }}</a>
+       <a href="{{ url_for('search.search', p='recid:%s' % recid, rm='wrd') }}">{{ _("Similar records") }}</a>
 
       {% if record['keywords']|length %} | <i class="glyphicon glyphicon-tag"></i>
       {% for keyword in record['keywords'] %}
@@ -108,7 +113,8 @@
       </div>
     </div>
     {% endif %}
-{% endmacro %}
+ {% endmacro %}
+ 
 
 {% macro render_fulltext_snippets() %}
   {{ tfn_get_fulltext_snippets(record['recid'], request.args['p'], qid, current_user) | wrap(prefix='<p><small>', suffix='</small></p>') }}
@@ -120,7 +126,12 @@
                                    separator=' <i class="glyphicon glyphicon-qrcode"></i> ') }}
 
   {{ bfe_publi_info(bfo, prefix='| <i class="glyphicon glyphicon-book"></i> ') }}
-  {{ bfe_doi(bfo, prefix='| <i class="glyphicon glyphicon-barcode"></i> ') }}
-  {# '<a href="http://dx.doi.org/%(doi)s" title="DOI" target="_blank"><i class="glyphicon glyphicon-barcode"></i> %(doi)s</a>'|format(doi=record['doi']) if record.get('doi') #}
+  <!-- {{ bfe_doi(bfo, prefix='DOI: ') }} -->
+
+  {{ '<span class="text-left label label-default">DOI </span> <span style="margin-left:-2px;" class="text-left label label-primary"><a  style="color:white;"href="http://dx.doi.org/%(doi)s" title="DOI" target="_blank">%(doi)s</a></span>'|format(doi=record['doi']) if record.get('doi') }}
+
 
 {% endmacro %}
+
+
+  

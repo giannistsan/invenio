@@ -44,6 +44,7 @@ define(function(require, exports, module) {
                 }
             })
 
+
             facet_list.facet({
                 button_builder: function(title) {
                     return require('hgn!./templates/button')({

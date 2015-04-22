@@ -20,10 +20,10 @@
 <div class="record-brief">
   {% block above_record_header %}
   {% endblock %}
-  <h4 class="record-header">
+  
     {% block record_header %}
     {% endblock %}
-  </h4>
+  
   <div class="record-content">
 
     <span class="pull-left record-leftside">
