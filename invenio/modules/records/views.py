@@ -254,7 +254,6 @@ def citations(recid):
     return render_template('records/citations.html',
                            citations=citations)
 
-
 @blueprint.route('/<int:recid>/keywords', methods=['GET', 'POST'])
 @request_record
 @register_menu(blueprint, 'record.keywords', _('Keywords'), order=4,

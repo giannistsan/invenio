@@ -175,6 +175,27 @@ def setup_app(app):
         """Return first `limit` number of sentences ending by `separator`."""
         return separator.join(value.split(separator)[:limit])
 
+    @app.template_filter('sentences_to_end')
+    def _sentences_to_end(value, limit, separator='. '):
+        """Return last `limit` number of sentences ending by `separator`."""
+        return separator.join(value.split(separator)[limit:])
+
+    @app.template_filter('is_list')
+    def _is_list(value):
+        """Checks if an object is a list"""
+        if isinstance(value, list):
+            return True
+   
+    @app.template_filter('split_by_column')
+    def _split_by_column(value,limit, separator=':'):
+         return separator.join(value.split(separator)[limit:])
+
+    @app.template_filter('words')
+    def _words(value, limit, separator=' '):
+         """Return first `limit` number of words ending by `separator`' '"""
+         result = separator.join(value.split(separator)[:limit])
+         return result + '...'    
+
     @app.template_filter('path_join')
     def _os_path_join(d):
         """Shortcut for `os.path.join`."""
