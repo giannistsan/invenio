@@ -185,7 +185,17 @@ def setup_app(app):
         """Checks if an object is a list"""
         if isinstance(value, list):
             return True
-   
+
+    @app.template_filter('remove_duplicates')
+    def _remove_duplicates(value):
+        seen = set()
+        uniq = []
+        for x in value:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
+
     @app.template_filter('split_by_column')
     def _split_by_column(value,limit, separator=':'):
          return separator.join(value.split(separator)[limit:])
