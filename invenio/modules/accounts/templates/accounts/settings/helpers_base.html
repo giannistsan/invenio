@@ -18,10 +18,10 @@
 #}
 
 
-{%- macro panel_start(title, icon="", btn_text='', btn='', btn_icon='', btn_href='', btn_class='btn-default', btn_name='', id="", with_body=True) %}
+{%- macro panel_start(title, icon="", btn_text='', btn='', btn_icon='', btn_href='', btn_class='btn-default', btn_name='', id="", with_body=True, panel_extra_class="panel-default") %}
 {%- block panel_start scoped %}
 <div class="panel-group panel-bot-margin"{% if id %} id="{{id}}"{% endif %}>
-    <div class="panel panel-default">
+    <div class="panel {{panel_extra_class}}">
         {%- block panel_heading scoped %}
         <div class="panel-heading">
             <strong>{%if icon %}<i class="{{icon}}"></i>{% endif %} {{title}}</strong>
