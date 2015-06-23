@@ -231,7 +231,7 @@ def main():
 def process_single(tarball, sdir=CFG_TMPSHAREDIR, xtract_text=False,
                    upload_plots=False, force=False, squash="",
                    yes_i_know=False, refno_url="",
-                   clean=False, recid=None, upload_mode='append'):
+                   clean=False, recid=None, upload_mode='append', direct_xml_output=True):
     """
     Processes one tarball end-to-end.
 

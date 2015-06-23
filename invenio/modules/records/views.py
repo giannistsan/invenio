@@ -49,6 +49,8 @@ from .models import Record as Bibrec
 from .utils import citations_nb_counts, references_nb_counts, \
     visible_collection_tabs
 
+from invenio.ext.cache import cache
+
 blueprint = Blueprint('record', __name__, url_prefix="/" + CFG_SITE_RECORD,
                       static_url_path='/record', template_folder='templates',
                       static_folder='static')

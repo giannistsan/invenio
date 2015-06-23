@@ -265,6 +265,7 @@ def bibupload(record, opt_mode=None, opt_notimechange=0, oai_rec_id="", pretend=
 
     record_deleted_p = False
     record_creation_date = None
+
     if opt_mode == 'insert' or \
     (opt_mode == 'replace_or_insert') and rec_id is None:
         insert_mode_p = True

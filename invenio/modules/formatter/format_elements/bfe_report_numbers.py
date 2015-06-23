@@ -1,53 +1,82 @@
 # -*- coding: utf-8 -*-
-#
-# This file is part of Invenio.
-# Copyright (C) 2007, 2008, 2009, 2010, 2011 CERN.
-#
-# Invenio is free software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License as
-# published by the Free Software Foundation; either version 2 of the
-# License, or (at your option) any later version.
-#
-# Invenio is distributed in the hope that it will be useful, but
-# WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-# General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-"""BibFormat element - Prints report numbers
-"""
-
-__revision__ = ""
+##
+## This file is part of Invenio.
+## Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+"""BibFormat element - Prints report numbers"""
 
 import cgi
 from invenio.utils.url import create_html_link
 
-def format_element(bfo, limit, separator=" ", extension=" etc.", link='yes', just_one='no'):
+
+def format_element(bfo, separator=', ', limit='9999', extension=" etc.", just_one='no'):
+    """
+    Print the report numbers of the record (037__a and 088__a)
+
+    Call get_report_numbers_formatted to do the heavy lifting so that it can
+    be re-used inside other BFEs easily.  Retaining the magic function
+    format_element is still handy for magic parameters, e.g., prefix, suffix
+    and friends.
+    """
+    just_one = just_one == 'yes'
+    return get_report_numbers_formatted(bfo, separator, limit, extension,
+           skip=['arXiv'], just_one=just_one)
+
+
+def get_report_numbers_formatted(bfo, separator, limit, extension=" etc.", skip=None, just_one=False):
     """
     Prints the report numbers of the record (037__a and 088__a)
 
     @param separator: the separator between report numbers.
     @param limit: the max number of report numbers to print
     @param extension: a prefix printed when limit param is reached
-    @param link: if 'yes', display report number with corresponding link when possible
+    @param skip: list or string of report-number patterns to NOT print
     """
-    numbers = bfo.fields("037__a")
-    numbers.extend(bfo.fields("088__a"))
+    out = []
+
+    if type(skip) == str:
+        skip = [skip]
+
+    def _skippable(value):
+        if skip:
+            for keyword in skip:
+                if keyword.lower() in value.get('a', '').lower() or \
+                   value.get('9', '').lower() == keyword.lower():
+                    return True
+        if value.get('a', '').lower().startswith("fermilab") and \
+           bfo.field("710__g").lower() in ('atlas collaboration', 'cms collaboration'):
+            return True
+
+    numbers = bfo.fields("037__")
+    numbers.extend(bfo.fields("088__"))
 
     # Only display the first one
-    if just_one == 'yes':
+    if just_one:
         numbers = numbers[:1]
 
-    if limit.isdigit():
-        limit_as_int = int(limit)
-        if limit_as_int <= len(numbers):
-            return separator.join(numbers[:limit_as_int]) + extension
+    for x in numbers:
+        if _skippable(x):
+            continue
+        if 'a' in x:
+            out.append(x['a'])
 
-    return separator.join([build_report_number_link(report_number, \
-                                                    link == 'yes') \
-                           for report_number in numbers])
+    if limit.isdigit() and int(limit) <= len(out):
+        return separator.join(out[:int(limit)]) + extension
+    else:
+        return separator.join(out)
 
 def build_report_number_link(report_number, link_p=True):
     """
@@ -62,9 +91,12 @@ def build_report_number_link(report_number, link_p=True):
     else:
         return cgi.escape(report_number)
 
+# we know the argument is unused, thanks
+# pylint: disable-msg=W0613
 def escape_values(bfo):
     """
     Called by BibFormat in order to check if output of this element
     should be escaped.
     """
     return 0
+# pylint: enable-msg=W0613
